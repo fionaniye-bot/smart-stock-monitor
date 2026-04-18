@@ -1,6 +1,7 @@
 """仪表盘任务处理器
 
 处理仪表盘任务的调度和执行，包含文件锁机制防止竞态条件
+集成健康检查系统，提供增强的错误处理
 """
 import os
 import time
@@ -10,6 +11,7 @@ from datetime import datetime, timedelta
 
 from .models import DashboardTask, TaskStatus
 from .file_lock import FileLock
+from .health_check import HealthCheckSystem
 
 
 class DashboardProcessor:
@@ -19,7 +21,8 @@ class DashboardProcessor:
     使用文件锁机制防止并发处理导致的竞态条件。
     """
 
-    def __init__(self, task_dir: str = ".", lock_dir: str = ".", timeout: int = 30):
+    def __init__(self, task_dir: str = ".", lock_dir: str = ".", timeout: int = 30,
+                 health_check: Optional[HealthCheckSystem] = None):
         """
         初始化任务处理器
 
@@ -27,15 +30,47 @@ class DashboardProcessor:
             task_dir: 任务文件目录
             lock_dir: 锁文件目录
             timeout: 锁超时时间（秒）
+            health_check: 可选的健康检查系统实例，如果为None则创建默认实例
         """
         self.task_dir = task_dir
         self.lock_dir = lock_dir
         self.timeout = timeout
         self.logger = logging.getLogger(__name__)
 
+        # 初始化健康检查系统
+        if health_check is None:
+            # 使用任务目录的父目录作为基础路径
+            base_path = os.path.dirname(os.path.abspath(task_dir))
+            self.health_check = HealthCheckSystem(base_path=base_path)
+        else:
+            self.health_check = health_check
+
         # 确保目录存在
         os.makedirs(task_dir, exist_ok=True)
         os.makedirs(lock_dir, exist_ok=True)
+
+        # 初始化健康状态
+        self._initialize_health_status()
+
+    def _initialize_health_status(self) -> None:
+        """初始化健康状态"""
+        try:
+            # 更新仪表盘处理器组件状态
+            self.health_check.update_component_status(
+                component_name="dashboard_processor",
+                status="running",
+                task_dir=self.task_dir,
+                lock_dir=self.lock_dir,
+                timeout=self.timeout,
+                initialized_at=datetime.now().isoformat()
+            )
+
+            # 执行初始系统检查
+            self.health_check.perform_system_check()
+
+            self.logger.info("健康检查系统初始化完成")
+        except Exception as e:
+            self.logger.error(f"初始化健康检查系统失败: {e}")
 
     def find_pending_tasks(self) -> List[str]:
         """
@@ -168,7 +203,30 @@ class DashboardProcessor:
 
                 except Exception as e:
                     # 处理失败
-                    self.logger.error(f"任务处理失败 {task_id}: {e}")
+                    error_msg = f"任务处理失败 {task_id}: {e}"
+                    self.logger.error(error_msg)
+
+                    # 添加健康检查警报
+                    self.health_check.add_alert(
+                        level="error",
+                        component="dashboard_processor",
+                        message=f"任务处理失败: {task_id}",
+                        details={
+                            "task_id": task_id,
+                            "task_type": task_type,
+                            "exception_type": type(e).__name__,
+                            "error_message": str(e),
+                            "timestamp": datetime.now().isoformat()
+                        }
+                    )
+
+                    # 更新组件状态为错误
+                    self.health_check.update_component_status(
+                        component_name="dashboard_processor",
+                        status="warning",
+                        last_error=error_msg,
+                        error_time=datetime.now().isoformat()
+                    )
 
                     task_data["status"] = "failed"
                     task_data["error"] = str(e)
@@ -205,14 +263,54 @@ class DashboardProcessor:
             task_data: 任务数据
             task_status: 任务状态对象
         """
-        if task_type == "data_filter":
-            self._process_data_filter(task_id, task_data, task_status)
-        elif task_type == "strategy_backtest":
-            self._process_strategy_backtest(task_id, task_data, task_status)
-        elif task_type == "indicator_adjust":
-            self._process_indicator_adjust(task_id, task_data, task_status)
-        else:
-            raise ValueError(f"不支持的任务类型: {task_type}")
+        try:
+            # 更新健康检查状态
+            self.health_check.update_component_status(
+                component_name="dashboard_processor",
+                status="processing",
+                current_task=task_id,
+                task_type=task_type,
+                start_time=datetime.now().isoformat()
+            )
+
+            if task_type == "data_filter":
+                self._process_data_filter(task_id, task_data, task_status)
+            elif task_type == "strategy_backtest":
+                self._process_strategy_backtest(task_id, task_data, task_status)
+            elif task_type == "indicator_adjust":
+                self._process_indicator_adjust(task_id, task_data, task_status)
+            else:
+                raise ValueError(f"不支持的任务类型: {task_type}")
+
+            # 任务处理成功，更新健康状态
+            self.health_check.update_component_status(
+                component_name="dashboard_processor",
+                status="running",
+                last_successful_task=task_id,
+                success_time=datetime.now().isoformat()
+            )
+
+        except Exception as e:
+            # 记录详细的错误信息
+            error_details = {
+                "task_id": task_id,
+                "task_type": task_type,
+                "user_config": task_data.get("user_config", {}),
+                "exception_type": type(e).__name__,
+                "error_message": str(e),
+                "timestamp": datetime.now().isoformat()
+            }
+
+            # 添加更详细的警报
+            self.health_check.add_alert(
+                level="error",
+                component="dashboard_processor",
+                message=f"任务处理失败: {task_id} ({task_type})",
+                details=error_details
+            )
+
+            # 重新抛出异常，让外层处理
+            raise
 
     def _process_data_filter(self, task_id: str, task_data: Dict[str, Any], task_status: TaskStatus):
         """处理数据筛选任务"""
@@ -351,3 +449,39 @@ class DashboardProcessor:
 
         except Exception as e:
             self.logger.error(f"清理过期锁文件失败: {e}")
+
+    def get_health_status(self) -> Dict[str, Any]:
+        """
+        获取系统健康状态
+
+        Returns:
+            包含健康状态信息的字典
+        """
+        try:
+            status = self.health_check.get_status()
+            return status.to_dict()
+        except Exception as e:
+            self.logger.error(f"获取健康状态失败: {e}")
+            return {
+                "system_status": "unknown",
+                "error": str(e),
+                "timestamp": datetime.now().isoformat()
+            }
+
+    def perform_health_check(self) -> Dict[str, Any]:
+        """
+        执行健康检查并返回结果
+
+        Returns:
+            包含健康检查结果的字典
+        """
+        try:
+            status = self.health_check.perform_system_check()
+            return status.to_dict()
+        except Exception as e:
+            self.logger.error(f"执行健康检查失败: {e}")
+            return {
+                "system_status": "error",
+                "error": str(e),
+                "timestamp": datetime.now().isoformat()
+            }
