@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黄金市场技术分析报告 | 2026年4月</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0f0f23;
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .main-title {
+            text-align: center;
+            padding: 30px 0 20px;
+            position: relative;
+        }
+        .main-title h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #d4a847;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(212, 168, 71, 0.3);
+        }
+        .main-title .subtitle {
+            font-size: 14px;
+            color: #8892b0;
+            margin-top: 8px;
+            letter-spacing: 2px;
+        }
+        .main-title::after {
+            content: '';
+            display: block;
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #d4a847, transparent);
+            margin: 15px auto 0;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 10px;
+        }
+        .card {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(212, 168, 71, 0.1);
+            border: 1px solid rgba(212, 168, 71, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(212, 168, 71, 0.15);
+        }
+        .card-full {
+            grid-column: 1 / -1;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ccd6f6;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(212, 168, 71, 0.12);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title .gold {
+            color: #d4a847;
+        }
+        .card-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: rgba(212, 168, 71, 0.15);
+            color: #d4a847;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .chart-box {
+            width: 100%;
+            height: 400px;
+        }
+        .chart-box-tall {
+            height: 480px;
+        }
+        .footer {
+            text-align: center;
+            padding: 30px 0 10px;
+            color: #4a4f6a;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+        .footer span {
+            color: #d4a847;
+        }
+        .data-source {
+            text-align: center;
+            padding: 5px 0 20px;
+            color: #4a4f6a;
+            font-size: 12px;
+        }
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .main-title h1 {
+                font-size: 22px;
+            }
+            .chart-box {
+                height: 320px;
+            }
+            .chart-box-tall {
+                height: 380px;
+            }
+        }
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .card {
+                padding: 12px;
+            }
+            .chart-box {
+                height: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-title">
+    <h1>黄金市场技术分析报告</h1>
+    <div class="subtitle">Gold Market Technical Analysis Report | 2026年4月</div>
+</div>
+
+<div class="container">
+
+    <!-- Chart 1: 国际金价月度走势 -->
+    <div class="card card-full">
+        <div class="card-title">
+            <span class="num">1</span>
+            国际<span class="gold">黄金</span>月度走势 &nbsp;<span style="font-size:12px;color:#8892b0;font-weight:400;">XAUUSD 美元/盎司</span>
+        </div>
+        <div class="chart-box chart-box-tall" id="chart1"></div>
+    </div>
+
+    <!-- Chart 2: 国内金价走势 -->
+    <div class="card">
+        <div class="card-title">
+            <span class="num">2</span>
+            国内<span class="gold">黄金</span>日线走势 &nbsp;<span style="font-size:12px;color:#8892b0;font-weight:400;">AU9999 元/克</span>
+        </div>
+        <div class="chart-box" id="chart2"></div>
+    </div>
+
+    <!-- Chart 3: 机构目标价对比 -->
+    <div class="card">
+        <div class="card-title">
+            <span class="num">3</span>
+            机构目标价<span class="gold">对比</span>
+        </div>
+        <div class="chart-box" id="chart3"></div>
+    </div>
+
+    <!-- Chart 4: 驱动因素雷达图 -->
+    <div class="card">
+        <div class="card-title">
+            <span class="num">4</span>
+            驱动因素<span class="gold">雷达图</span>
+        </div>
+        <div class="chart-box" id="chart4"></div>
+    </div>
+
+    <!-- Chart 5: 多空因素对比 -->
+    <div class="card">
+        <div class="card-title">
+            <span class="num">5</span>
+            多空因素<span class="gold">对比</span>
+        </div>
+        <div class="chart-box" id="chart5"></div>
+    </div>
+
+    <!-- Chart 6: 关键技术位 -->
+    <div class="card">
+        <div class="card-title">
+            <span class="num">6</span>
+            关键<span class="gold">技术位</span>
+        </div>
+        <div class="chart-box" id="chart6"></div>
+    </div>
+
+</div>
+
+<div class="data-source">数据来源：Wind / LBMA / 各大机构研报 &nbsp;|&nbsp; 截至 2026年4月26日</div>
+<div class="footer">Gold Market Technical Analysis &nbsp;<span>|</span>&nbsp; 2026.04</div>
+
+<script>
+(function() {
+
+    // ==================== 全局 ECharts 主题 ====================
+    var textColor = '#8892b0';
+    var goldColor = '#d4a847';
+    var axisColor = '#2a2f4a';
+    var gridConf = { left: 60, right: 30, top: 40, bottom: 40 };
+
+    // ==================== Chart 1: 国际金价月度走势 ====================
+    (function() {
+        var dom = document.getElementById('chart1');
+        var chart = echarts.init(dom);
+        var months = ['2025年10月', '2025年11月', '2025年12月', '2026年1月', '2026年2月', '2026年3月', '2026年4月'];
+        var prices = [2780, 2850, 2920, 5595, 5100, 4322, 4770];
+
+        var option = {
+            tooltip: {
+                trigger: 'axis',
+                backgroundColor: 'rgba(15,15,35,0.9)',
+                borderColor: '#d4a847',
+                borderWidth: 1,
+                textStyle: { color: '#ccd6f6', fontSize: 13 },
+                formatter: function(params) {
+                    var p = params[0];
+                    var dt = p.axisValue;
+                    var val = p.value.toLocaleString();
+                    var chg = '';
+                    if (p.dataIndex > 0) {
+                        var prev = prices[p.dataIndex - 1];
+                        var diff = p.value - prev;
+                        var pct = ((diff / prev) * 100).toFixed(2);
+                        var sign = diff >= 0 ? '+' : '';
+                        chg = '<br/>变动: ' + sign + diff.toLocaleString() + ' (' + sign + pct + '%)';
+                    }
+                    return '<div style="font-weight:600;color:#d4a847;font-size:14px;">' + dt + '</div>' +
+                           '<div style="margin-top:6px;">国际金价: <span style="color:#f0c040;font-weight:700;">$' + val + '</span></div>' + chg;
+                }
+            },
+            grid: gridConf,
+            xAxis: {
+                type: 'category',
+                data: months,
+                axisLine: { lineStyle: { color: axisColor } },
+                axisLabel: { color: textColor, fontSize: 11 },
+                axisTick: { show: false }
+            },
+            yAxis: {
+                type: 'value',
+                min: 2500,
+                axisLine: { show: false },
+                axisLabel: {
+                    color: textColor,
+                    fontSize: 11,
+                    formatter: function(v) { return '$' + v.toLocaleString(); }
+                },
+                splitLine: { lineStyle: { color: '#1e2340', type: 'dashed' } }
+            },
+            series: [{
+                type: 'line',
+                data: prices,
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 8,
+                lineStyle: {
+                    color: '#d4a847',
+                    width: 3,
+                    shadowColor: 'rgba(212,168,71,0.3)',
+                    shadowBlur: 8
+                },
+                itemStyle: { color: '#d4a847' },
+                areaStyle: {
+                    color: {
+                        type: 'linear',
+                        x: 0, y: 0, x2: 0, y2: 1,
+                        colorStops: [
+                            { offset: 0, color: 'rgba(212,168,71,0.35)' },
+                            { offset: 0.5, color: 'rgba(212,168,71,0.12)' },
+                            { offset: 1, color: 'rgba(212,168,71,0.02)' }
+                        ]
+                    }
+                },
+                markPoint: {
+                    data: [
+                        { type: 'max', name: '历史高点' },
+                        { type: 'min', name: '回调低点' }
+                    ],
+                    symbol: 'pin',
+                    symbolSize: 50,
+                    label: {
+                        color: '#fff',
+                        fontSize: 11,
+                        fontWeight: 'bold',
+                        formatter: function(p) {
+                            return '$' + p.value.toLocaleString();
+                        }
+                    },
+                    itemStyle: {
+                        color: function(p) {
+                            return p.dataIndex === 3 ? '#f04864' : '#3ba272';
+                        }
+                    }
+                },
+                markLine: {
+                    silent: true,
+                    data: [
+                        {
+                            yAxis: 5595,
+                            label: {
+                                formatter: '历史高点 $5,595',
+                                color: '#f04864',
+                                fontSize: 11,
+                                position: 'insideEndTop'
+                            },
+                            lineStyle: { color: '#f04864', type: 'dashed', width: 1.5 }
+                        },
+                        {
+                            yAxis: 4322,
+                            label: {
+                                formatter: '回调低点 $4,322',
+                                color: '#3ba272',
+                                fontSize: 11,
+                                position: 'insideEndBottom'
+                            },
+                            lineStyle: { color: '#3ba272', type: 'dashed', width: 1.5 }
+                        },
+                        {
+                            yAxis: 4770,
+                            label: {
+                                formatter: '当前 $4,770',
+                                color: '#d4a847',
+                                fontSize: 11,
+                                position: 'insideEndTop'
+                            },
+                            lineStyle: { color: '#d4a847', type: 'dashed', width: 1.5 }
+                        }
+                    ]
+                }
+            }],
+            backgroundColor: 'transparent'
+        };
+
+        chart.setOption(option);
+        window.addEventListener('resize', function() { chart.resize(); });
+    })();
+
+    // ==================== Chart 2: 国内金价走势 ====================
+    (function() {
+        var dom = document.getElementById('chart2');
+        var chart = echarts.init(dom);
+        var dates = ['4/7', '4/8', '4/9', '4/10', '4/11', '4/14', '4/15', '4/16', '4/17', '4/18', '4/21', '4/22', '4/23', '4/24', '4/25', '4/26'];
+        var prices = [1030, 1028, 1035, 1036, 1038, 1048, 1050, 1045, 1042, 1044, 1050, 1047, 1042, 1037, 1040, 1040];
+
+        var option = {
+            tooltip: {
+                trigger: 'axis',
+                backgroundColor: 'rgba(15,15,35,0.9)',
+                borderColor: '#d4a847',
+                borderWidth: 1,
+                textStyle: { color: '#ccd6f6', fontSize: 13 },
+                formatter: function(params) {
+                    var p = params[0];
+                    var dt = p.axisValue;
+                    var val = p.value;
+                    var chg = '';
+                    if (p.dataIndex > 0) {
+                        var prev = prices[p.dataIndex - 1];
+                        var diff = val - prev;
+                        var pct = ((diff / prev) * 100).toFixed(2);
+                        var sign = diff >= 0 ? '+' : '';
+                        chg = '<br/>变动: ' + sign + diff + ' (' + sign + pct + '%)';
+                    }
+                    return '<div style="font-weight:600;color:#d4a847;font-size:13px;">2026年' + dt.replace('/', '月') + '日</div>' +
+                           '<div style="margin-top:6px;">AU9999: <span style="color:#f0c040;font-weight:700;">' + val + ' 元/克</span></div>' + chg;
+                }
+            },
+            grid: Object.assign({}, gridConf, { left: 50, right: 20 }),
+            xAxis: {
+                type: 'category',
+                data: dates,
+                axisLine: { lineStyle: { color: axisColor } },
+                axisLabel: { color: textColor, fontSize: 10, rotate: 30 },
+                axisTick: { show: false }
+            },
+            yAxis: {
+                type: 'value',
+                min: 1020,
+                max: 1060,
+                axisLine: { show: false },
+                axisLabel: {
+                    color: textColor,
+                    fontSize: 10,
+                    formatter: function(v) { return v + ''; }
+                },
+                splitLine: { lineStyle: { color: '#1e2340', type: 'dashed' } }
+            },
+            series: [{
+                type: 'line',
+                data: prices,
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 6,
+                lineStyle: {
+                    color: '#d4a847',
+                    width: 2,
+                    shadowColor: 'rgba(212,168,71,0.2)',
+                    shadowBlur: 6
+                },
+                itemStyle: { color: '#d4a847' },
+                areaStyle: {
+                    color: {
+                        type: 'linear',
+                        x: 0, y: 0, x2: 0, y2: 1,
+                        colorStops: [
+                            { offset: 0, color: 'rgba(212,168,71,0.3)' },
+                            { offset: 1, color: 'rgba(212,168,71,0.02)' }
+                        ]
+                    }
+                },
+                markPoint: {
+                    data: [
+                        { type: 'max', name: '月内高点' },
+                        { type: 'min', name: '月内低点' }
+                    ],
+                    symbol: 'pin',
+                    symbolSize: 40,
+                    label: {
+                        color: '#fff',
+                        fontSize: 10,
+                        fontWeight: 'bold',
+                        formatter: function(p) { return p.value + ''; }
+                    }
+                }
+            }],
+            backgroundColor: 'transparent'
+        };
+
+        chart.setOption(option);
+        window.addEventListener('resize', function() { chart.resize(); });
+    })();
+
+    // ==================== Chart 3: 机构目标价对比 ====================
+    (function() {
+        var dom = document.getElementById('chart3');
+        var chart = echarts.init(dom);
+        var names = ['摩根士丹利', '高盛', '富国银行', '当前价'];
+        var values = [5200, 5400, 8000, 4770];
+        var colors = ['#3b82f6', '#8b5cf6', '#f59e0b', '#d4a847'];
+
+        var option = {
+            tooltip: {
+                trigger: 'axis',
+                backgroundColor: 'rgba(15,15,35,0.9)',
+                borderColor: '#d4a847',
+                borderWidth: 1,
+                textStyle: { color: '#ccd6f6', fontSize: 13 },
+                formatter: function(params) {
+                    var p = params[0];
+                    var val = p.value.toLocaleString();
+                    var nm = p.name;
+                    var diff = val - 4770;
+                    var sign = diff >= 0 ? '+' : '';
+                    var vs = nm === '当前价' ? '' : ('<br/>较当前价: ' + sign + diff.toLocaleString());
+                    return '<div style="font-weight:600;color:#d4a847;font-size:13px;">' + nm + '</div>' +
+                           '<div style="margin-top:6px;">目标价: <span style="color:#f0c040;font-weight:700;">$' + val + '</span></div>' + vs;
+                }
+            },
+            grid: Object.assign({}, gridConf, { left: 50, right: 20 }),
+            xAxis: {
+                type: 'category',
+                data: names,
+                axisLine: { lineStyle: { color: axisColor } },
+                axisLabel: { color: textColor, fontSize: 12, fontWeight: '600' },
+                axisTick: { show: false }
+            },
+            yAxis: {
+                type: 'value',
+                min: 4000,
+                max: 8500,
+                axisLine: { show: false },
+                axisLabel: {
+                    color: textColor,
+                    fontSize: 10,
+                    formatter: function(v) { return '$' + (v / 1000).toFixed(1) + 'k'; }
+                },
+                splitLine: { lineStyle: { color: '#1e2340', type: 'dashed' } }
+            },
+            series: [{
+                type: 'bar',
+                data: values.map(function(v, i) {
+                    return {
+                        value: v,
+                        itemStyle: {
+                            color: colors[i],
+                            borderRadius: [4, 4, 0, 0],
+                            shadowColor: colors[i].replace(')', ',0.4)').replace('rgb', 'rgba'),
+                            shadowBlur: 8
+                        }
+                    };
+                }),
+                barWidth: '50%',
+                label: {
+                    show: true,
+                    position: 'top',
+                    color: '#ccd6f6',
+                    fontSize: 12,
+                    fontWeight: 'bold',
+                    formatter: function(p) { return '$' + p.value.toLocaleString(); }
+                }
+            }],
+            backgroundColor: 'transparent'
+        };
+
+        chart.setOption(option);
+        window.addEventListener('resize', function() { chart.resize(); });
+    })();
+
+    // ==================== Chart 4: 驱动因素雷达图 ====================
+    (function() {
+        var dom = document.getElementById('chart4');
+        var chart = echarts.init(dom);
+        var indicators = [
+            { name: '央行购金', max: 100 },
+            { name: '去美元化', max: 100 },
+            { name: '降息预期', max: 100 },
+            { name: '地缘风险', max: 100 },
+            { name: '通胀对冲', max: 100 },
+            { name: 'ETF持仓', max: 100 }
+        ];
+        var values = [95, 90, 60, 85, 80, 45];
+
+        var option = {
+            tooltip: {
+                backgroundColor: 'rgba(15,15,35,0.9)',
+                borderColor: '#d4a847',
+                borderWidth: 1,
+                textStyle: { color: '#ccd6f6', fontSize: 13 },
+                formatter: function(params) {
+                    var vals = params.value;
+                    var html = '<div style="font-weight:600;color:#d4a847;font-size:14px;margin-bottom:6px;">驱动因素评分</div>';
+                    indicators.forEach(function(ind, i) {
+                        html += '<div style="display:flex;justify-content:space-between;gap:20px;">' +
+                                '<span>' + ind.name + '</span>' +
+                                '<span style="color:#f0c040;font-weight:600;">' + vals[i] + '</span>' +
+                                '</div>';
+                    });
+                    return html;
+                }
+            },
+            radar: {
+                indicator: indicators,
+                radius: '68%',
+                center: ['50%', '52%'],
+                axisName: {
+                    color: '#ccd6f6',
+                    fontSize: 12,
+                    fontWeight: '600'
+                },
+                splitArea: {
+                    areaStyle: {
+                        color: ['rgba(212,168,71,0.02)', 'rgba(212,168,71,0.04)', 'rgba(212,168,71,0.02)', 'rgba(212,168,71,0.04)', 'rgba(212,168,71,0.02)']
+                    }
+                },
+                axisLine: { lineStyle: { color: 'rgba(212,168,71,0.2)' } },
+                splitLine: { lineStyle: { color: 'rgba(212,168,71,0.15)' } }
+            },
+            series: [{
+                type: 'radar',
+                data: [{
+                    value: values,
+                    name: '驱动因素',
+                    areaStyle: {
+                        color: {
+                            type: 'radial',
+                            x: 0.5, y: 0.5, r: 0.5,
+                            colorStops: [
+                                { offset: 0, color: 'rgba(212,168,71,0.5)' },
+                                { offset: 1, color: 'rgba(212,168,71,0.08)' }
+                            ]
+                        }
+                    },
+                    lineStyle: { color: '#d4a847', width: 2 },
+                    itemStyle: { color: '#d4a847' }
+                }],
+                symbol: 'circle',
+                symbolSize: 6,
+                label: {
+                    show: true,
+                    formatter: function(p) { return p.value; },
+                    color: '#f0c040',
+                    fontSize: 11,
+                    fontWeight: 'bold'
+                }
+            }],
+            backgroundColor: 'transparent'
+        };
+
+        chart.setOption(option);
+        window.addEventListener('resize', function() { chart.resize(); });
+    })();
+
+    // ==================== Chart 5: 多空因素对比 ====================
+    (function() {
+        var dom = document.getElementById('chart5');
+        var chart = echarts.init(dom);
+        var factors = ['央行购金', '去美元化', '地缘风险', '美联储终将降息', '通胀黏性', '降息推迟', 'ETF流出', '美元强势', '高利率环境', '油价冲击'];
+        var values = [3, 2.5, 2, 2, 1.5, -2, -1.5, -2, -2.5, -1];
+
+        // Sort: positive first (desc), then negative (asc)
+        var combined = factors.map(function(f, i) { return { name: f, value: values[i] }; });
+        var sorted = combined.slice().sort(function(a, b) {
+            if (a.value >= 0 && b.value < 0) return -1;
+            if (a.value < 0 && b.value >= 0) return 1;
+            return b.value - a.value;
+        });
+
+        var sortedNames = sorted.map(function(d) { return d.name; });
+        var sortedValues = sorted.map(function(d) { return d.value; });
+
+        var option = {
+            tooltip: {
+                trigger: 'axis',
+                backgroundColor: 'rgba(15,15,35,0.9)',
+                borderColor: '#d4a847',
+                borderWidth: 1,
+                textStyle: { color: '#ccd6f6', fontSize: 13 },
+                formatter: function(params) {
+                    var p = params[0];
+                    var val = p.value;
+                    var dir = val > 0 ? '看多 (+' + val + ')' : val < 0 ? '看空 (' + val + ')' : '中性';
+                    var cls = val > 0 ? '#3ba272' : '#f04864';
+                    return '<div style="font-weight:600;color:#d4a847;font-size:13px;">' + p.name + '</div>' +
+                           '<div style="margin-top:6px;">影响: <span style="color:' + cls + ';font-weight:700;">' + dir + '</span></div>';
+                }
+            },
+            grid: Object.assign({}, gridConf, { left: 100, right: 50, top: 20, bottom: 20 }),
+            xAxis: {
+                type: 'value',
+                min: -3.5,
+                max: 3.5,
+                axisLine: { show: false },
+                axisLabel: { color: textColor, fontSize: 10, formatter: function(v) { return v > 0 ? '+' + v : v; } },
+                splitLine: { lineStyle: { color: '#1e2340', type: 'dashed' } }
+            },
+            yAxis: {
+                type: 'category',
+                data: sortedNames,
+                axisLine: { lineStyle: { color: axisColor } },
+                axisLabel: { color: '#ccd6f6', fontSize: 11, fontWeight: '600' },
+                axisTick: { show: false }
+            },
+            series: [{
+                type: 'bar',
+                data: sortedValues.map(function(v) {
+                    return {
+                        value: v,
+                        itemStyle: {
+                            color: v >= 0 ? '#3ba272' : '#f04864',
+                            borderRadius: v >= 0 ? [0, 4, 4, 0] : [4, 0, 0, 4]
+                        }
+                    };
+                }),
+                barWidth: '50%',
+                label: {
+                    show: true,
+                    position: function(p) { return p.value >= 0 ? 'right' : 'left'; },
+                    color: '#ccd6f6',
+                    fontSize: 11,
+                    fontWeight: 'bold',
+                    formatter: function(p) { return (p.value >= 0 ? '+' : '') + p.value; }
+                }
+            }],
+            backgroundColor: 'transparent'
+        };
+
+        chart.setOption(option);
+        window.addEventListener('resize', function() { chart.resize(); });
+    })();
+
+    // ==================== Chart 6: 关键技术位 ====================
+    (function() {
+        var dom = document.getElementById('chart6');
+        var chart = echarts.init(dom);
+        var months = ['2025年10月', '2025年11月', '2025年12月', '2026年1月', '2026年2月', '2026年3月', '2026年4月'];
+        var prices = [2780, 2850, 2920, 5595, 5100, 4322, 4770];
+
+        // Build markLine for key levels
+        var markLines = [
+            {
+                yAxis: 5595,
+                label: {
+                    formatter: '历史高点 5,595',
+                    color: '#f04864',
+                    fontSize: 10,
+                    fontWeight: 'bold',
+                    position: 'insideEndTop'
+                },
+                lineStyle: { color: '#f04864', type: 'solid', width: 2 }
+            },
+            {
+                yAxis: 5000,
+                label: {
+                    formatter: '心理位 5,000',
+                    color: '#f59e0b',
+                    fontSize: 10,
+                    fontWeight: 'bold',
+                    position: 'insideEndTop'
+                },
+                lineStyle: { color: '#f59e0b', type: 'dashed', width: 1.5 }
+            },
+            {
+                yAxis: 4770,
+                label: {
+                    formatter: '当前价 4,770',
+                    color: '#d4a847',
+                    fontSize: 10,
+                    fontWeight: 'bold',
+                    position: 'insideEndBottom'
+                },
+                lineStyle: { color: '#d4a847', type: 'solid', width: 2 }
+            },
+            {
+                yAxis: 4322,
+                label: {
+                    formatter: '3月低点 4,322',
+                    color: '#3ba272',
+                    fontSize: 10,
+                    fontWeight: 'bold',
+                    position: 'insideEndBottom'
+                },
+                lineStyle: { color: '#3ba272', type: 'dashed', width: 1.5 }
+            }
+        ];
+
+        var option = {
+            tooltip: {
+                trigger: 'axis',
+                backgroundColor: 'rgba(15,15,35,0.9)',
+                borderColor: '#d4a847',
+                borderWidth: 1,
+                textStyle: { color: '#ccd6f6', fontSize: 13 },
+                formatter: function(params) {
+                    var p = params[0];
+                    return '<div style="font-weight:600;color:#d4a847;font-size:13px;">' + p.axisValue + '</div>' +
+                           '<div style="margin-top:6px;">价格: <span style="color:#f0c040;font-weight:700;">$' + p.value.toLocaleString() + '</span></div>';
+                }
+            },
+            grid: gridConf,
+            xAxis: {
+                type: 'category',
+                data: months,
+                axisLine: { lineStyle: { color: axisColor } },
+                axisLabel: { color: textColor, fontSize: 10, rotate: 25 },
+                axisTick: { show: false }
+            },
+            yAxis: {
+                type: 'value',
+                min: 2500,
+                max: 6000,
+                axisLine: { show: false },
+                axisLabel: {
+                    color: textColor,
+                    fontSize: 10,
+                    formatter: function(v) { return '$' + v.toLocaleString(); }
+                },
+                splitLine: { lineStyle: { color: '#1e2340', type: 'dashed' } }
+            },
+            series: [{
+                type: 'line',
+                data: prices,
+                smooth: false,
+                symbol: 'diamond',
+                symbolSize: 10,
+                lineStyle: {
+                    color: '#d4a847',
+                    width: 2.5
+                },
+                itemStyle: { color: '#d4a847' },
+                markLine: {
+                    silent: true,
+                    symbol: 'none',
+                    data: markLines,
+                    animation: false
+                },
+                markPoint: {
+                    data: [
+                        {
+                            coord: ['2026年1月', 5595],
+                            symbol: 'pin',
+                            symbolSize: 45,
+                            itemStyle: { color: '#f04864' },
+                            label: {
+                                color: '#fff',
+                                fontSize: 10,
+                                fontWeight: 'bold',
+                                formatter: '$5,595\n历史高点'
+                            }
+                        },
+                        {
+                            coord: ['2026年3月', 4322],
+                            symbol: 'pin',
+                            symbolSize: 40,
+                            itemStyle: { color: '#3ba272' },
+                            label: {
+                                color: '#fff',
+                                fontSize: 10,
+                                fontWeight: 'bold',
+                                formatter: '$4,322\n回调低点'
+                            }
+                        },
+                        {
+                            coord: ['2026年4月', 4770],
+                            symbol: 'pin',
+                            symbolSize: 40,
+                            itemStyle: { color: '#d4a847' },
+                            label: {
+                                color: '#fff',
+                                fontSize: 10,
+                                fontWeight: 'bold',
+                                formatter: '$4,770\n当前'
+                            }
+                        }
+                    ]
+                }
+            }],
+            backgroundColor: 'transparent'
+        };
+
+        chart.setOption(option);
+        window.addEventListener('resize', function() { chart.resize(); });
+    })();
+
+})();
+</script>
+
+</body>
+</html>

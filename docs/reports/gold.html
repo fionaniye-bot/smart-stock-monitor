@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>黄金投资策略研究报告</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, 'Microsoft YaHei', sans-serif; background: #0f0f23; color: #e0e0e0; }
+.header { background: linear-gradient(135deg, #1a1a2e, #16213e); border-bottom: 2px solid #d4a847; padding: 30px 40px; text-align: center; }
+.header h1 { font-size: 28px; color: #d4a847; margin-bottom: 8px; }
+.header .sub { font-size: 14px; color: #888; }
+.container { max-width: 1300px; margin: 0 auto; padding: 20px; }
+
+.quote-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.quote-card { background: #1a1a2e; border: 1px solid #333; border-radius: 10px; padding: 16px; text-align: center; }
+.quote-card .label { font-size: 12px; color: #888; margin-bottom: 4px; }
+.quote-card .value { font-size: 22px; font-weight: 700; color: #d4a847; }
+.quote-card .value.up { color: #e74c3c; }
+.quote-card .value.down { color: #27ae60; }
+
+.section { background: #1a1a2e; border: 1px solid #333; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+.section h2 { font-size: 18px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid #333; color: #d4a847; }
+.section h2 .tag { font-size: 12px; color: #fff; background: #d4a847; color: #1a1a2e; border-radius: 4px; padding: 2px 8px; margin-left: 8px; vertical-align: middle; font-weight: 600; }
+
+.chart-box { width: 100%; height: 420px; }
+.chart-box-sm { width: 100%; height: 300px; }
+
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; color: #ccc; }
+.data-table th { background: #16213e; padding: 10px 8px; text-align: center; border: 1px solid #333; font-weight: 600; color: #d4a847; }
+.data-table td { padding: 8px; text-align: center; border: 1px solid #333; }
+.data-table tr:hover { background: #1a2744; }
+.data-table .up { color: #e74c3c; }
+.data-table .down { color: #27ae60; }
+.data-table .gold { color: #d4a847; font-weight: 600; }
+
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 768px) { .summary-grid { grid-template-columns: 1fr; } }
+
+.signal-box { padding: 12px 16px; border-radius: 8px; font-size: 14px; }
+.signal-bull { background: #1a2e1a; border-left: 4px solid #27ae60; }
+.signal-bear { background: #2e1a1a; border-left: 4px solid #e74c3c; }
+.signal-box .s-label { font-weight: 600; margin-bottom: 4px; }
+.signal-box ul { list-style: none; padding-left: 0; }
+.signal-box li { padding: 3px 0; font-size: 13px; }
+
+.verdict-box { background: linear-gradient(135deg, #1a1a2e, #16213e); border: 2px solid #d4a847; border-radius: 10px; padding: 20px; text-align: center; margin-top: 16px; }
+.verdict-box .v-label { font-size: 14px; color: #d4a847; }
+.verdict-box .v-value { font-size: 26px; font-weight: 700; margin: 8px 0; color: #fff; }
+.verdict-box .v-desc { font-size: 13px; color: #aaa; }
+
+.footer { text-align: center; padding: 20px; color: #555; font-size: 12px; }
+
+.level-label { font-size: 11px; color: #888; }
+.support-line { color: #27ae60; }
+.resistance-line { color: #e74c3c; }
+
+.gold-badge { display: inline-block; background: #d4a847; color: #1a1a2e; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>黄金 (XAUUSD) 投资策略研究报告</h1>
+  <div class="sub">数据截止: 2026-04-26 | 分析期间: 2026年1月~4月 | 数据来源: 上海黄金交易所 / 各大投行</div>
+</div>
+
+<div class="container">
+
+<!-- Quote Cards -->
+<div class="quote-grid">
+  <div class="quote-card"><div class="label">XAUUSD 当前价</div><div class="value">4,770</div></div>
+  <div class="quote-card"><div class="label">年初至今</div><div class="value down">-14.7%</div></div>
+  <div class="quote-card"><div class="label">AU9999 当前价</div><div class="value">1,040</div></div>
+  <div class="quote-card"><div class="label">年内高点</div><div class="value">5,595</div></div>
+  <div class="quote-card"><div class="label">年内低点</div><div class="value">4,322</div></div>
+  <div class="quote-card"><div class="label">年内波幅</div><div class="value">~20%</div></div>
+  <div class="quote-card"><div class="label">美元指数</div><div class="value">~104</div></div>
+  <div class="quote-card"><div class="label">10Y美债</div><div class="value">4.39%</div></div>
+</div>
+
+<!-- Key Levels -->
+<div class="section">
+  <h2>关键价位 <span class="tag">XAUUSD 美元/盎司</span></h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+    <div style="padding:12px;background:#2e1a1a;border-radius:8px;border-left:4px solid #e74c3c;">
+      <div style="font-size:12px;color:#e74c3c;font-weight:600;">阻力位</div>
+      <div style="font-size:18px;font-weight:700;margin-top:4px;">5,595</div>
+      <div style="font-size:11px;color:#888;">历史高点 (2026.01)</div>
+      <div style="font-size:18px;font-weight:700;margin-top:8px;">5,280</div>
+      <div style="font-size:11px;color:#888;">0.382 斐波那契</div>
+      <div style="font-size:18px;font-weight:700;margin-top:8px;">5,000</div>
+      <div style="font-size:11px;color:#888;">心理关口</div>
+    </div>
+    <div style="padding:12px;background:#1a2e1a;border-radius:8px;border-left:4px solid #27ae60;">
+      <div style="font-size:12px;color:#27ae60;font-weight:600;">支撑位</div>
+      <div style="font-size:18px;font-weight:700;margin-top:4px;color:#e0e0e0;">4,500</div>
+      <div style="font-size:11px;color:#888;">0.618 回撤位</div>
+      <div style="font-size:18px;font-weight:700;margin-top:8px;color:#e0e0e0;">4,322</div>
+      <div style="font-size:11px;color:#888;">年内低点 (2026.03)</div>
+      <div style="font-size:18px;font-weight:700;margin-top:8px;color:#e0e0e0;">4,200</div>
+      <div style="font-size:11px;color:#888;">2025年密集成交区</div>
+    </div>
+  </div>
+  <div style="margin-top:12px;text-align:center;padding:12px;background:#16213e;border-radius:8px;">
+    <span style="color:#d4a847;font-size:16px;font-weight:700;">当前价位: 4,700~4,837</span>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="section">
+  <h2>黄金价格走势图表</h2>
+  <div id="chartGoldTrend" class="chart-box"></div>
+</div>
+
+<div class="section">
+  <h2>国内金价日线 (AU9999) <span class="tag">2026年4月</span></h2>
+  <div id="chartAu9999" class="chart-box-sm"></div>
+</div>
+
+<div class="section">
+  <h2>机构目标价对比 <span class="tag">美元/盎司</span></h2>
+  <div id="chartTargets" class="chart-box-sm"></div>
+</div>
+
+<div class="section">
+  <h2>驱动因素雷达图</h2>
+  <div id="chartRadar" class="chart-box-sm"></div>
+</div>
+
+<div class="section">
+  <h2>多空因素对比</h2>
+  <div id="chartFactors" class="chart-box-sm"></div>
+</div>
+
+<!-- Institutional Views -->
+<div class="section">
+  <h2>主流机构观点 <span class="tag">目标价汇总</span></h2>
+  <div style="overflow-x:auto">
+    <table class="data-table">
+      <tr><th>机构</th><th>目标价</th><th>评级</th><th>核心逻辑</th></tr>
+      <tr><td>摩根士丹利</td><td class="gold">5,200</td><td>超配</td><td>去美元化+央行购金长期支撑</td></tr>
+      <tr><td>高盛</td><td class="gold">5,400</td><td>超配</td><td>储备体系重构，长期牛市早期</td></tr>
+      <tr><td>富国银行</td><td class="gold">8,000</td><td>极度看多</td><td>法币体系面临信任危机</td></tr>
+      <tr><td>广开首席</td><td>4,300~5,300</td><td>中性偏多</td><td>前低后高，宽幅波动</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- Driver Analysis -->
+<div class="section">
+  <h2>核心驱动因素</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+    <div style="background:#1a2e1a;border-radius:8px;padding:12px;border-left:4px solid #27ae60;">
+      <div style="font-weight:700;margin-bottom:8px;color:#27ae60;">中长期利多</div>
+      <ul style="list-style:none;padding:0;font-size:13px;">
+        <li style="padding:3px 0;">✓ 中国央行连续17个月增持黄金</li>
+        <li style="padding:3px 0;">✓ 2026Q1全球央行净购金215吨</li>
+        <li style="padding:3px 0;">✓ 美元储备占比从70.8%降至56.8%</li>
+        <li style="padding:3px 0;">✓ 美联储降息终将到来</li>
+        <li style="padding:3px 0;">✓ 地缘政治风险长期化</li>
+      </ul>
+    </div>
+    <div style="background:#2e1a1a;border-radius:8px;padding:12px;border-left:4px solid #e74c3c;">
+      <div style="font-weight:700;margin-bottom:8px;color:#e74c3c;">短期压制因素</div>
+      <ul style="list-style:none;padding:0;font-size:13px;">
+        <li style="padding:3px 0;">✗ 降息预期从3次降至1次</li>
+        <li style="padding:3px 0;">✗ 10年期美债收益率4.39%</li>
+        <li style="padding:3px 0;">✗ 3月ETF流出约120亿美元</li>
+        <li style="padding:3px 0;">✗ 油价突破100美元/桶冲击</li>
+        <li style="padding:3px 0;">✗ 强势美元压制</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Summary -->
+<div class="section">
+  <h2>综合评价</h2>
+  <div class="summary-grid" id="signalSummary"></div>
+  <div class="verdict-box" id="verdictBox"></div>
+</div>
+
+<!-- Strategy -->
+<div class="section">
+  <h2>投资策略总结</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+    <div style="background:#16213e;border-radius:8px;padding:12px;text-align:center;border-top:3px solid #d4a847;">
+      <div style="font-size:12px;color:#d4a847;">入场区间</div>
+      <div style="font-size:18px;font-weight:700;margin:8px 0;">4,200~4,800</div>
+      <div style="font-size:11px;color:#888;">分批建仓 (30/40/30)</div>
+    </div>
+    <div style="background:#16213e;border-radius:8px;padding:12px;text-align:center;border-top:3px solid #27ae60;">
+      <div style="font-size:12px;color:#27ae60;">目标价位</div>
+      <div style="font-size:18px;font-weight:700;margin:8px 0;">5,000~5,595</div>
+      <div style="font-size:11px;color:#888;">分批止盈</div>
+    </div>
+    <div style="background:#16213e;border-radius:8px;padding:12px;text-align:center;border-top:3px solid #e74c3c;">
+      <div style="font-size:12px;color:#e74c3c;">止损价位</div>
+      <div style="font-size:18px;font-weight:700;margin:8px 0;">4,200</div>
+      <div style="font-size:11px;color:#888;">-12% 硬止损</div>
+    </div>
+  </div>
+  <div style="margin-top:12px;text-align:center;padding:12px;background:#1a1a2e;border-radius:8px;border:1px solid #333;">
+    <span style="color:#aaa;font-size:13px;">综合评级: </span>
+    <span style="color:#d4a847;font-size:18px;font-weight:700;">中性偏多</span>
+    <span style="color:#555;margin:0 12px;">|</span>
+    <span style="color:#aaa;font-size:13px;">评分: </span>
+    <span style="color:#fff;font-size:18px;font-weight:700;">6.6/10</span>
+    <span style="color:#555;margin:0 12px;">|</span>
+    <span style="color:#aaa;font-size:13px;">建议仓位: </span>
+    <span style="color:#fff;font-size:18px;font-weight:700;">5%~10%</span>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  <p>免责声明: 本报告仅供参考，不构成投资建议。黄金投资有风险，入市须谨慎。</p>
+  <p>Generated by FMCG Analysis Team &mdash; 2026-04-26</p>
+</div>
+
+<script>
+// ====== Charts ======
+
+// 1. International Gold Price Trend
+const chartGoldTrend = echarts.init(document.getElementById('chartGoldTrend'));
+chartGoldTrend.setOption({
+  tooltip: { trigger: 'axis' },
+  grid: { left: '8%', right: '5%', bottom: '10%', top: '10%' },
+  xAxis: { type: 'category', data: ['2025-10', '2025-11', '2025-12', '2026-01', '2026-02', '2026-03', '2026-04'], axisLabel: { color: '#888' } },
+  yAxis: { type: 'value', min: 4000, max: 6000, splitLine: { lineStyle: { color: '#222' } }, axisLabel: { color: '#888', formatter: '${value}' } },
+  visualMap: { show: false },
+  series: [{
+    type: 'line', data: [2780, 2850, 2920, 5595, 5100, 4322, 4770],
+    smooth: true, symbol: 'circle', symbolSize: 8,
+    lineStyle: { width: 3, color: '#d4a847' },
+    areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(212,168,71,0.3)' }, { offset: 1, color: 'rgba(212,168,71,0.02)' }] } },
+    markPoint: {
+      data: [
+        { name: '历史高点', coord: ['2026-01', 5595], value: '5,595', symbolSize: 60, itemStyle: { color: '#e74c3c' } },
+        { name: '年内低点', coord: ['2026-03', 4322], value: '4,322', symbolSize: 60, itemStyle: { color: '#27ae60' } }
+      ], label: { color: '#fff', fontSize: 11, fontWeight: 'bold' }
+    },
+    markLine: {
+      data: [
+        { yAxis: 5000, name: '心理关口', lineStyle: { type: 'dashed', color: '#d4a847' }, label: { formatter: '心理关口 5,000', color: '#d4a847' } }
+      ]
+    }
+  }]
+});
+
+// 2. AU9999 Daily
+const chartAu9999 = echarts.init(document.getElementById('chartAu9999'));
+chartAu9999.setOption({
+  tooltip: { trigger: 'axis' },
+  grid: { left: '8%', right: '5%', bottom: '10%', top: '10%' },
+  xAxis: { type: 'category', data: ['4/7','4/8','4/9','4/10','4/11','4/14','4/15','4/16','4/17','4/18','4/21','4/22','4/23','4/24','4/25','4/26'], axisLabel: { color: '#888', rotate: 45 } },
+  yAxis: { type: 'value', min: 1020, max: 1065, splitLine: { lineStyle: { color: '#222' } }, axisLabel: { color: '#888', formatter: '{value}' } },
+  series: [{
+    type: 'line', data: [1030, 1028, 1035, 1036, 1038, 1048, 1050, 1045, 1042, 1044, 1050, 1047, 1042, 1037, 1040, 1040],
+    smooth: true, symbol: 'circle', symbolSize: 6,
+    lineStyle: { width: 2, color: '#d4a847' },
+    areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(212,168,71,0.3)' }, { offset: 1, color: 'rgba(212,168,71,0.02)' }] } },
+    markPoint: {
+      data: [
+        { name: '月内高', coord: ['4/15', 1050], value: '1,050', symbolSize: 50, itemStyle: { color: '#e74c3c' } },
+        { name: '月内低', coord: ['4/8', 1028], value: '1,028', symbolSize: 50, itemStyle: { color: '#27ae60' } }
+      ], label: { color: '#fff', fontSize: 11 }
+    }
+  }]
+});
+
+// 3. Institutional Targets
+const chartTargets = echarts.init(document.getElementById('chartTargets'));
+chartTargets.setOption({
+  tooltip: { trigger: 'axis', formatter: p => p[0].name + '<br/>' + p[0].value.toLocaleString() },
+  grid: { left: '8%', right: '5%', bottom: '10%', top: '10%' },
+  xAxis: { type: 'category', data: ['当前价', '摩根士丹利', '高盛', '富国银行'], axisLabel: { color: '#888' } },
+  yAxis: { type: 'value', min: 4000, max: 9000, splitLine: { lineStyle: { color: '#222' } }, axisLabel: { color: '#888', formatter: '${value}' } },
+  series: [{
+    type: 'bar', data: [
+      { value: 4770, itemStyle: { color: '#d4a847' } },
+      { value: 5200, itemStyle: { color: '#3498db' } },
+      { value: 5400, itemStyle: { color: '#e67e22' } },
+      { value: 8000, itemStyle: { color: '#e74c3c' } }
+    ],
+    barWidth: '50%',
+    label: { show: true, position: 'top', formatter: '${c}', color: '#ccc', fontSize: 12 }
+  }]
+});
+
+// 4. Radar
+const chartRadar = echarts.init(document.getElementById('chartRadar'));
+chartRadar.setOption({
+  tooltip: {},
+  radar: {
+    indicator: [
+      { name: '央行购金', max: 100 },
+      { name: '去美元化', max: 100 },
+      { name: '降息预期', max: 100 },
+      { name: '地缘风险', max: 100 },
+      { name: '通胀对冲', max: 100 },
+      { name: 'ETF持仓', max: 100 }
+    ],
+    axisName: { color: '#d4a847' },
+    splitArea: { areaStyle: { color: ['rgba(212,168,71,0.02)', 'rgba(212,168,71,0.05)'] } },
+    splitLine: { lineStyle: { color: '#333' } }
+  },
+  series: [{
+    type: 'radar', data: [{ value: [95, 90, 60, 85, 80, 45], name: '驱动强度' }],
+    areaStyle: { color: 'rgba(212,168,71,0.2)' },
+    lineStyle: { color: '#d4a847', width: 2 },
+    itemStyle: { color: '#d4a847' }
+  }]
+});
+
+// 5. Bull/Bear Factors
+const chartFactors = echarts.init(document.getElementById('chartFactors'));
+chartFactors.setOption({
+  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+  grid: { left: '25%', right: '5%', bottom: '5%', top: '5%' },
+  xAxis: { type: 'value', min: -3, max: 3.5, splitLine: { lineStyle: { color: '#222' } }, axisLabel: { color: '#888' } },
+  yAxis: { type: 'category', data: ['ETF流出', '降息推迟', '油价冲击', '高利率', '美元强势', '降息终将到来', '通胀黏性', '地缘风险', '去美元化', '央行购金'], axisLabel: { color: '#ccc', fontSize: 12 } },
+  series: [
+    { type: 'bar', data: [-1.5, -2, -1, -2.5, -2, 2, 1.5, 2, 2.5, 3],
+      barWidth: '60%',
+      label: { show: true, position: 'right', formatter: p => p.value > 0 ? '+' + p.value : p.value, color: '#ccc' },
+      itemStyle: { color: p => p.value >= 0 ? '#27ae60' : '#e74c3c' }
+    }
+  ]
+});
+
+// ====== Summary ======
+(function drawSummary() {
+  const bulls = ['RSI 55~60 中性偏强', 'MACD日线金叉', '4月反弹+11%', '央行购金持续', '双底形态雏形'];
+  const bears = ['均线空头排列未完全扭转', '降息预期仅剩1次', 'ETF流出120亿美元', '美债收益率4.39%'];
+
+  document.getElementById('signalSummary').innerHTML = `
+    <div class="signal-box signal-bull">
+      <div class="s-label">利多信号 (${bulls.length})</div>
+      <ul>${bulls.map(s => '<li>+ ' + s + '</li>').join('')}</ul>
+    </div>
+    <div class="signal-box signal-bear">
+      <div class="s-label">利空信号 (${bears.length})</div>
+      <ul>${bears.map(s => '<li>- ' + s + '</li>').join('')}</ul>
+    </div>
+  `;
+
+  document.getElementById('verdictBox').innerHTML = `
+    <div class="v-label">综合评价</div>
+    <div class="v-value">中性偏多 (Neutral-Bullish)</div>
+    <div class="v-desc">短期4,500~4,900区间震荡 | 中期4,500~5,200震荡偏多 | 长期4,800~5,500震荡上行 (利多${bulls.length} vs 利空${bears.length})</div>
+  `;
+})();
+
+// ====== Resize ======
+window.addEventListener('resize', () => {
+  chartGoldTrend.resize();
+  chartAu9999.resize();
+  chartTargets.resize();
+  chartRadar.resize();
+  chartFactors.resize();
+});
+</script>
+</body>
+</html>

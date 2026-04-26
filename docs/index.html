@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Stock Monitor - 智能盯盘报告</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #333; }
+.header { background: linear-gradient(135deg, #c0392b, #8e1a1a); color: #fff; padding: 40px; text-align: center; }
+.header h1 { font-size: 32px; margin-bottom: 8px; }
+.header p { font-size: 14px; opacity: 0.85; }
+.container { max-width: 1000px; margin: 0 auto; padding: 24px; }
+.section { background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.section h2 { font-size: 18px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid #f0f2f5; color: #c0392b; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 640px) { .card-grid { grid-template-columns: 1fr; } }
+.card { background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 20px; transition: all 0.2s; cursor: pointer; }
+.card:hover { border-color: #c0392b; box-shadow: 0 4px 16px rgba(192,57,43,0.15); transform: translateY(-2px); }
+.card .code { font-size: 12px; color: #c0392b; font-weight: 600; }
+.card .name { font-size: 18px; font-weight: 700; margin: 4px 0; }
+.card .desc { font-size: 13px; color: #888; }
+.card .tags { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+.card .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.tag-stock { background: #fff5f5; color: #c0392b; }
+.tag-gold { background: #fff8e1; color: #d4a847; }
+.tag-template { background: #f0f4ff; color: #3498db; }
+.tag-new { background: #f0fff4; color: #27ae60; }
+.card .links { margin-top: 12px; display: flex; gap: 8px; }
+.card .links a { padding: 4px 12px; border-radius: 4px; font-size: 12px; text-decoration: none; background: #f0f2f5; color: #555; transition: all 0.2s; }
+.card .links a:hover { background: #c0392b; color: #fff; }
+.resource-list { list-style: none; }
+.resource-list li { padding: 8px 0; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+.resource-list li:last-child { border-bottom: none; }
+.resource-list a { text-decoration: none; color: #3498db; font-size: 14px; }
+.resource-list a:hover { text-decoration: underline; }
+.resource-list .meta { font-size: 12px; color: #999; }
+.footer { text-align: center; padding: 20px; color: #999; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Smart Stock Monitor</h1>
+  <p>智能盯盘系统 · FMCG Analysis Team · 研究报告发布页</p>
+</div>
+
+<div class="container">
+
+  <!-- Reports -->
+  <div class="section">
+    <h2>研究报告</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="code">600519.SH</div>
+        <div class="name">贵州茅台</div>
+        <div class="desc">投资策略报告 — 三底叠加 + 改革拐点 + 估值修复</div>
+        <div class="tags">
+          <span class="tag tag-stock">A股</span>
+          <span class="tag tag-new">最新</span>
+        </div>
+        <div class="links">
+          <a href="reports/600519.html">HTML 报告</a>
+          <a href="visualizations/moutai_price_trend.png" target="_blank">走势图</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="code">XAUUSD / AU9999</div>
+        <div class="name">黄金走势分析</div>
+        <div class="desc">投资策略报告 — 深度回调砸出配置窗口，中长期牛市格局未破</div>
+        <div class="tags">
+          <span class="tag tag-gold">贵金属</span>
+          <span class="tag tag-new">最新</span>
+        </div>
+        <div class="links">
+          <a href="reports/gold.html">HTML 报告</a>
+          <a href="visualizations/gold_charts.html">图表页</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Template -->
+  <div class="section">
+    <h2>模板与资源</h2>
+    <ul class="resource-list">
+      <li>
+        <div>
+          <a href="template.html">报告模板 (template.html)</a>
+          <div style="font-size:12px;color:#888;margin-top:4px;">可复用的股票研究报告 HTML 模板，含 ECharts 图表</div>
+        </div>
+        <span class="meta">动态数据占位</span>
+      </li>
+      <li>
+        <div>
+          <a href="https://github.com/your-username/smart-stock-monitor" target="_blank">GitHub 仓库</a>
+          <div style="font-size:12px;color:#888;margin-top:4px;">源代码、数据、脚本</div>
+        </div>
+        <span class="meta">私有</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Project Info -->
+  <div class="section">
+    <h2>关于本项目</h2>
+    <p style="font-size:14px;line-height:1.8;color:#555;">
+      <strong>Smart Stock Monitor</strong> 是一个基于多智能体协作的智能盯盘分析系统。
+      通过 FMCG Analysis Team（5 个专业 AI 角色）的协同工作，自动完成数据采集、技术分析、可视化、报告生成的全流程。
+    </p>
+    <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:8px;text-align:center;font-size:12px;">
+      <div style="background:#f8f9fa;padding:8px;border-radius:6px;"><strong>📊 数据工程</strong><br>data-engineer</div>
+      <div style="background:#f8f9fa;padding:8px;border-radius:6px;"><strong>📈 市场分析</strong><br>market-analyst</div>
+      <div style="background:#f8f9fa;padding:8px;border-radius:6px;"><strong>🎨 可视化</strong><br>visual-designer</div>
+      <div style="background:#f8f9fa;padding:8px;border-radius:6px;"><strong>📝 报告</strong><br>report-architect</div>
+      <div style="background:#f8f9fa;padding:8px;border-radius:6px;"><strong>🎯 协调</strong><br>coordinator</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>Smart Stock Monitor &mdash; FMCG Analysis Team &mdash; 数据仅供参考，不构成投资建议</p>
+</div>
+
+</body>
+</html>

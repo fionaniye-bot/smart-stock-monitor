@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>股票研究报告 - 模板</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #333; }
+.header { background: linear-gradient(135deg, #c0392b, #8e1a1a); color: white; padding: 30px 40px; }
+.header h1 { font-size: 28px; margin-bottom: 8px; }
+.header .sub { font-size: 14px; opacity: 0.85; }
+.container { max-width: 1300px; margin: 0 auto; padding: 20px; }
+.quote-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.quote-card { background: white; border-radius: 10px; padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.quote-card .label { font-size: 12px; color: #888; margin-bottom: 4px; }
+.quote-card .value { font-size: 22px; font-weight: 700; }
+.quote-card .value.up { color: #c0392b; }
+.quote-card .value.down { color: #27ae60; }
+.section { background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.section h2 { font-size: 18px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid #f0f2f5; }
+.section h2 .tag { font-size: 12px; color: #fff; background: #c0392b; border-radius: 4px; padding: 2px 8px; margin-left: 8px; vertical-align: middle; }
+.chart-box { width: 100%; height: 420px; }
+.chart-box-sm { width: 100%; height: 250px; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th { background: #f8f9fa; padding: 10px 8px; text-align: center; border: 1px solid #e0e0e0; font-weight: 600; }
+.data-table td { padding: 8px; text-align: center; border: 1px solid #e0e0e0; }
+.data-table tr:hover { background: #f5f5f5; }
+.data-table .up { color: #c0392b; }
+.data-table .down { color: #27ae60; }
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 768px) { .summary-grid { grid-template-columns: 1fr; } }
+.signal-box { padding: 12px 16px; border-radius: 8px; font-size: 14px; }
+.signal-bull { background: #fff5f5; border-left: 4px solid #c0392b; }
+.signal-bear { background: #f0fff4; border-left: 4px solid #27ae60; }
+.signal-box .s-label { font-weight: 600; margin-bottom: 4px; }
+.signal-box ul { list-style: none; padding-left: 0; }
+.signal-box li { padding: 3px 0; font-size: 13px; }
+.verdict-box { background: linear-gradient(135deg, #c0392b, #e74c3c); color: #fff; border-radius: 10px; padding: 20px; text-align: center; margin-top: 16px; }
+.verdict-box .v-label { font-size: 14px; opacity: 0.9; }
+.verdict-box .v-value { font-size: 26px; font-weight: 700; margin: 8px 0; }
+.verdict-box .v-desc { font-size: 13px; opacity: 0.85; }
+.footer { text-align: center; padding: 20px; color: #999; font-size: 12px; }
+.tab-bar { display: flex; gap: 4px; margin-bottom: 16px; }
+.tab-btn { padding: 8px 20px; border: none; background: #f0f2f5; border-radius: 6px 6px 0 0; cursor: pointer; font-size: 14px; }
+.tab-btn.active { background: #c0392b; color: #fff; }
+.tab-btn:hover:not(.active) { background: #e0e0e0; }
+
+/* News section */
+.news-list { display: flex; flex-direction: column; gap: 14px; }
+.news-item { border-bottom: 1px solid #f0f0f0; padding-bottom: 14px; }
+.news-item:last-child { border-bottom: none; padding-bottom: 0; }
+.news-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 12px; color: #999; }
+.news-tag { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #fff; }
+.news-tag.policy { background: #3498db; }
+.news-tag.industry { background: #2ecc71; }
+.news-tag.company { background: #e67e22; }
+.news-tag.macro { background: #9b59b6; }
+.news-tag.market { background: #e74c3c; }
+.news-tag.other { background: #95a5a6; }
+.news-title { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 4px; }
+.news-summary { font-size: 13px; color: #666; line-height: 1.6; }
+.news-impact { display: inline-block; margin-left: auto; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.news-impact.bull { background: #fff5f5; color: #c0392b; }
+.news-impact.bear { background: #f0fff4; color: #27ae60; }
+.news-impact.neutral { background: #f8f9fa; color: #666; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1 id="reportTitle">股票代码 (CODE) 研究报告</h1>
+  <div class="sub" id="reportSub">数据范围: 开始日期 ~ 结束日期 | 生成时间: 2026-04-26 | 数据来源: 数据源</div>
+</div>
+
+<div class="container">
+  <!-- Quote Cards -->
+  <div class="quote-grid" id="quoteGrid"></div>
+
+  <!-- Charts -->
+  <div class="section">
+    <h2>技术分析图表</h2>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchView('kline')">K线 + 均线</button>
+      <button class="tab-btn" onclick="switchView('ma')">均线对比</button>
+      <button class="tab-btn" onclick="switchView('volume')">成交量</button>
+    </div>
+    <div id="chartKline" class="chart-box"></div>
+    <div id="chartMa" class="chart-box" style="display:none"></div>
+    <div id="chartVolume" class="chart-box" style="display:none"></div>
+  </div>
+
+  <div class="section">
+    <h2>MACD 指标 <span class="tag">12,26,9</span></h2>
+    <div id="chartMacd" class="chart-box-sm"></div>
+  </div>
+
+  <div class="section">
+    <h2>RSI &amp; KDJ 指标 <span class="tag">RSI(14) / KDJ(9,3,3)</span></h2>
+    <div id="chartRsiKdj" class="chart-box-sm"></div>
+  </div>
+
+  <div class="section">
+    <h2>最近交易日行情</h2>
+    <div style="overflow-x:auto"><table class="data-table" id="recentTable"></table></div>
+  </div>
+
+  <div class="section">
+    <h2>月度表现</h2>
+    <div style="overflow-x:auto"><table class="data-table" id="monthlyTable"></table></div>
+  </div>
+
+  <div class="section">
+    <h2>宏观新闻总结 <span class="tag">近期动态</span></h2>
+    <div class="news-list" id="newsList"></div>
+  </div>
+
+  <!-- Comprehensive Evaluation (SWOT + Scoring) -->
+  <div class="section">
+    <h2>FMCG团队综合评价 <span class="tag">多维度分析</span></h2>
+
+    <!-- SWOT Grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div style="background:#fff5f5;border-radius:8px;padding:12px;border-left:4px solid #c0392b;">
+        <div style="font-weight:700;margin-bottom:8px;font-size:14px;">优势 (Strengths)</div>
+        <ul style="list-style:none;padding:0;font-size:13px;" id="swotStrengths">
+          <li style="padding:3px 0;">✓ 优势数据将在报告中动态填充</li>
+        </ul>
+      </div>
+      <div style="background:#f0fff4;border-radius:8px;padding:12px;border-left:4px solid #27ae60;">
+        <div style="font-weight:700;margin-bottom:8px;font-size:14px;">劣势 (Weaknesses)</div>
+        <ul style="list-style:none;padding:0;font-size:13px;" id="swotWeaknesses">
+          <li style="padding:3px 0;">✗ 劣势数据将在报告中动态填充</li>
+        </ul>
+      </div>
+      <div style="background:#fff8e1;border-radius:8px;padding:12px;border-left:4px solid #f39c12;">
+        <div style="font-weight:700;margin-bottom:8px;font-size:14px;">机会 (Opportunities)</div>
+        <ul style="list-style:none;padding:0;font-size:13px;" id="swotOpportunities">
+          <li style="padding:3px 0;">★ 机会数据将在报告中动态填充</li>
+        </ul>
+      </div>
+      <div style="background:#f0f4ff;border-radius:8px;padding:12px;border-left:4px solid #3498db;">
+        <div style="font-weight:700;margin-bottom:8px;font-size:14px;">威胁 (Threats)</div>
+        <ul style="list-style:none;padding:0;font-size:13px;" id="swotThreats">
+          <li style="padding:3px 0;">▲ 威胁数据将在报告中动态填充</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Score Summary -->
+    <div style="background:linear-gradient(135deg,#c0392b,#8e1a1a);color:#fff;border-radius:10px;padding:16px;margin-bottom:16px;text-align:center;">
+      <div style="font-size:14px;opacity:0.9;">综合评分</div>
+      <div style="font-size:32px;font-weight:700;margin:8px 0;" id="totalScore">-- / 10</div>
+      <div style="font-size:16px;font-weight:600;" id="totalRating">评级</div>
+    </div>
+
+    <!-- Score Table -->
+    <table class="data-table" style="margin-bottom:16px;" id="scoreTable">
+      <tr><th>维度</th><th>权重</th><th>得分</th><th>加权</th><th>说明</th></tr>
+      <tr><td>基本面质量</td><td>25%</td><td id="s1">-</td><td id="w1">-</td><td id="d1">-</td></tr>
+      <tr><td>估值吸引力</td><td>20%</td><td id="s2">-</td><td id="w2">-</td><td id="d2">-</td></tr>
+      <tr><td>改革前景</td><td>20%</td><td id="s3">-</td><td id="w3">-</td><td id="d3">-</td></tr>
+      <tr><td>技术面趋势</td><td>15%</td><td id="s4">-</td><td id="w4">-</td><td id="d4">-</td></tr>
+      <tr><td>行业前景</td><td>10%</td><td id="s5">-</td><td id="w5">-</td><td id="d5">-</td></tr>
+      <tr><td>风险管理</td><td>10%</td><td id="s6">-</td><td id="w6">-</td><td id="d6">-</td></tr>
+      <tr style="font-weight:700;background:#f8f9fa;"><td>总分</td><td>100%</td><td>—</td><td id="totalWeighted">-</td><td id="totalDesc">-</td></tr>
+    </table>
+
+    <!-- Verdict Box -->
+    <div style="background:#1a1a2e;color:#fff;border-radius:10px;padding:20px;font-family:monospace;font-size:13px;line-height:1.8;" id="verdictMonospace">
+      ╔════════════════════════════════════════════════╗<br>
+      ║  数据将在报告中填充                            ║<br>
+      ╚════════════════════════════════════════════════╝<br>
+    </div>
+
+    <div style="margin-top:12px;padding:12px;background:#f8f9fa;border-radius:8px;font-size:13px;line-height:1.6;color:#555;" id="coreThesis">
+      <strong>核心论点</strong>: 待填充
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>综合评价</h2>
+    <div class="summary-grid" id="signalSummary"></div>
+    <div class="verdict-box" id="verdictBox"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>免责声明: 本报告技术指标仅供参考，不构成投资建议。股票投资有风险，入市须谨慎。</p>
+  <p>Generated by FMCG Analysis Team</p>
+</div>
+
+<script>
+/* ================================================================
+   使用说明:
+   1. 将 rawData 替换为实际数据 (格式: {d:"日期",o:开盘,h:最高,l:最低,c:收盘,v:成交量})
+   2. 将 indData 替换为实际计算指标 (格式: {ma5,ma10,ma20,ma60,macdD,macdDea,macdH,rsi,k,dd,j})
+   3. 修改 reportTitle / reportSub 中的文本
+   4. 直接打开 HTML 文件即可查看
+   ================================================================ */
+
+// ===== 数据区 (替换此处) =====
+const rawData = [
+  // {d:"YYYY-MM-DD",o:开盘价,h:最高价,l:最低价,c:收盘价,v:成交量}
+];
+
+const indData = [
+  // {d:"YYYY-MM-DD",ma5:数值,ma10:数值,ma20:数值,ma60:数值,macdD:数值,macdDea:数值,macdH:数值,rsi:数值,k:数值,dd:数值,j:数值}
+];
+
+const newsData = [
+  // {date:"YYYY-MM-DD", tag:"标签分类", tagType:"policy|industry|company|macro|market|other", title:"新闻标题", summary:"新闻摘要", impact:"bull|bear|neutral"}
+];
+
+// ===== 综合评价数据 (替换此处) =====
+const evalData = {
+  score: 7.75,
+  rating: '买入 (BUY)',
+  dimensions: [
+    { dim:'基本面质量', weight:'25%', score:8.0, weighted:'2.00', desc:'ROE>30%，毛利率>90%' },
+    { dim:'估值吸引力', weight:'20%', score:8.5, weighted:'1.70', desc:'PE 21x处5年最低' },
+    { dim:'改革前景', weight:'20%', score:9.0, weighted:'1.80', desc:'渠道改革成效显著' },
+    { dim:'技术面趋势', weight:'15%', score:6.0, weighted:'0.90', desc:'短期反弹中' },
+    { dim:'行业前景', weight:'10%', score:6.0, weighted:'0.60', desc:'龙头份额提升' },
+    { dim:'风险管理', weight:'10%', score:7.5, weighted:'0.75', desc:'止损清晰，回撤可控' }
+  ],
+  swot: {
+    strengths: ['品牌壁垒不可复制', 'ROE>30%，毛利率>91%', '账面现金充裕', '渠道改革成效显著'],
+    weaknesses: ['近期业绩承压', '消费代际变迁影响', '非标产品降价'],
+    opportunities: ['PE处历史低位', '改革红利释放', '机构目标价有上行空间'],
+    threats: ['行业产量连续下滑', '消费税改革潜在影响', '宏观经济不确定性']
+  },
+  verdict: {
+    entry: '1,380 ~ 1,460 元',
+    target: '1,600 / 1,780 / 2,000',
+    stop: '1,320 元 (-9.5%)',
+    period: '6~12 个月',
+    position: '5%~10%',
+    riskReward: '1.48:1'
+  },
+  thesis: '三底叠加(业绩底+估值底+政策底) + 改革拐点 + 估值修复。具备中长期配置价值。'
+};
+
+// ===== 报告信息 (替换此处) =====
+document.getElementById('reportTitle').textContent = '股票代码 (CODE) 研究报告';
+document.getElementById('reportSub').textContent = '数据范围: ~ | 生成时间: ' + new Date().toISOString().slice(0,10) + ' | 数据来源: ';
+
+// ===== 以下代码无需修改 =====
+const dates = rawData.map(d => d.d);
+const quoteData = rawData.map(d => [d.o, d.c, d.l, d.h]);
+const volumes = rawData.map(d => d.v);
+const closes = rawData.map(d => d.c);
+const opens = rawData.map(d => d.o);
+const last = rawData[rawData.length-1] || {o:0,h:0,l:0,c:0,v:0,d:''};
+const prev = rawData[rawData.length-2] || {c:last.c};
+const change = last.c - prev.c;
+const pct = prev.c ? (change/prev.c*100) : 0;
+const sign = change >= 0 ? '+' : '';
+const upClass = change >= 0 ? 'up' : 'down';
+
+document.getElementById('quoteGrid').innerHTML = `
+  <div class="quote-card"><div class="label">当前价</div><div class="value ${upClass}">${last.c.toFixed(2)}</div></div>
+  <div class="quote-card"><div class="label">涨跌幅</div><div class="value ${upClass}">${sign}${pct.toFixed(2)}%</div></div>
+  <div class="quote-card"><div class="label">开盘</div><div class="value">${last.o.toFixed(2)}</div></div>
+  <div class="quote-card"><div class="label">最高</div><div class="value">${last.h.toFixed(2)}</div></div>
+  <div class="quote-card"><div class="label">最低</div><div class="value">${last.l.toFixed(2)}</div></div>
+  <div class="quote-card"><div class="label">成交量</div><div class="value">${(last.v/10000).toFixed(1)}万</div></div>
+  <div class="quote-card"><div class="label">区间最高</div><div class="value">${Math.max(...rawData.map(d=>d.h)).toFixed(2)}</div></div>
+  <div class="quote-card"><div class="label">区间最低</div><div class="value">${Math.min(...rawData.map(d=>d.l)).toFixed(2)}</div></div>
+`;
+
+let chartKline, chartMa, chartVolume, chartMacd, chartRsiKdj;
+
+function drawKline() {
+  chartKline = echarts.init(document.getElementById('chartKline'));
+  const ma5 = indData.map(d => d.ma5);
+  const ma10 = indData.map(d => d.ma10);
+  const ma20 = indData.map(d => d.ma20);
+  const ma60 = indData.map(d => d.ma60);
+  chartKline.setOption({
+    tooltip: { trigger:'axis', axisPointer:{type:'cross'} },
+    grid: { left:'5%', right:'5%', bottom:'15%', top:'5%' },
+    xAxis: { type:'category', data:dates, axisLabel:{rotate:45,fontSize:10} },
+    yAxis: { type:'value', scale:true, splitLine:{lineStyle:{type:'dashed'}} },
+    dataZoom: [{ type:'inside', start:80, end:100 }, { type:'slider', start:80, end:100, height:20, bottom:0 }],
+    series: [
+      { name:'K线', type:'candlestick', data:quoteData, itemStyle:{color:'#c0392b',color0:'#27ae60',borderColor:'#c0392b',borderColor0:'#27ae60'} },
+      { name:'MA5', type:'line', data:ma5, symbol:'none', lineStyle:{width:1,color:'#e67e22'}, smooth:true },
+      { name:'MA10', type:'line', data:ma10, symbol:'none', lineStyle:{width:1,color:'#3498db'}, smooth:true },
+      { name:'MA20', type:'line', data:ma20, symbol:'none', lineStyle:{width:1,color:'#9b59b6'}, smooth:true },
+      { name:'MA60', type:'line', data:ma60, symbol:'none', lineStyle:{width:1,color:'#2ecc71'}, smooth:true }
+    ]
+  });
+}
+
+function drawMa() {
+  chartMa = echarts.init(document.getElementById('chartMa'));
+  const ma5 = indData.map(d => d.ma5);
+  const ma10 = indData.map(d => d.ma10);
+  const ma20 = indData.map(d => d.ma20);
+  const ma60 = indData.map(d => d.ma60);
+  chartMa.setOption({
+    tooltip:{trigger:'axis'}, grid:{left:'5%',right:'5%',bottom:'10%',top:'10%'},
+    xAxis:{type:'category',data:dates,axisLabel:{rotate:45,fontSize:10}},
+    yAxis:{type:'value',scale:true,splitLine:{lineStyle:{type:'dashed'}}},
+    dataZoom:[{type:'inside',start:80,end:100},{type:'slider',start:80,end:100,height:20,bottom:0}],
+    legend:{data:['收盘价','MA5','MA10','MA20','MA60'],top:5},
+    series:[
+      {name:'收盘价',type:'line',data:closes,symbol:'none',lineStyle:{width:1,color:'#666'}},
+      {name:'MA5',type:'line',data:ma5,symbol:'none',lineStyle:{width:1.5,color:'#e67e22'}},
+      {name:'MA10',type:'line',data:ma10,symbol:'none',lineStyle:{width:1.5,color:'#3498db'}},
+      {name:'MA20',type:'line',data:ma20,symbol:'none',lineStyle:{width:1.5,color:'#9b59b6'}},
+      {name:'MA60',type:'line',data:ma60,symbol:'none',lineStyle:{width:1.5,color:'#2ecc71'}}
+    ]
+  });
+}
+
+function drawVolume() {
+  chartVolume = echarts.init(document.getElementById('chartVolume'));
+  const volColors = rawData.map(d => d.c >= d.o ? '#c0392b' : '#27ae60');
+  chartVolume.setOption({
+    tooltip:{trigger:'axis'}, grid:{left:'5%',right:'5%',bottom:'10%',top:'5%'},
+    xAxis:{type:'category',data:dates,axisLabel:{rotate:45,fontSize:10}},
+    yAxis:{type:'value',splitLine:{lineStyle:{type:'dashed'}}},
+    dataZoom:[{type:'inside',start:80,end:100},{type:'slider',start:80,end:100,height:20,bottom:0}],
+    series:[{type:'bar',data:volumes,itemStyle:{color:p=>volColors[p.dataIndex]}}]
+  });
+}
+
+function drawMacd() {
+  chartMacd = echarts.init(document.getElementById('chartMacd'));
+  const dif = indData.map(d => d.macdD);
+  const dea = indData.map(d => d.macdDea);
+  const hist = indData.map(d => d.macdH);
+  const hc = hist.map(v => v >= 0 ? '#c0392b' : '#27ae60');
+  chartMacd.setOption({
+    tooltip:{trigger:'axis'}, grid:{left:'5%',right:'5%',bottom:'10%',top:'10%'},
+    xAxis:{type:'category',data:dates,axisLabel:{rotate:45,fontSize:10}},
+    yAxis:{type:'value',splitLine:{lineStyle:{type:'dashed'}}},
+    dataZoom:[{type:'inside',start:80,end:100},{type:'slider',start:80,end:100,height:20,bottom:0}],
+    legend:{data:['DIF','DEA','MACD柱'],top:5},
+    series:[
+      {name:'DIF',type:'line',data:dif,symbol:'none',lineStyle:{width:1.5,color:'#3498db'}},
+      {name:'DEA',type:'line',data:dea,symbol:'none',lineStyle:{width:1.5,color:'#e67e22'}},
+      {name:'MACD柱',type:'bar',data:hist,itemStyle:{color:p=>hc[p.dataIndex]}}
+    ]
+  });
+}
+
+function drawRsiKdj() {
+  chartRsiKdj = echarts.init(document.getElementById('chartRsiKdj'));
+  const rsiData = indData.map(d => d.rsi);
+  const kData = indData.map(d => d.k);
+  const dData = indData.map(d => d.dd);
+  const jData = indData.map(d => d.j);
+  chartRsiKdj.setOption({
+    tooltip:{trigger:'axis'}, grid:{left:'5%',right:'5%',bottom:'10%',top:'10%'},
+    xAxis:{type:'category',data:dates,axisLabel:{rotate:45,fontSize:10}},
+    yAxis:{type:'value',min:0,max:120,splitLine:{lineStyle:{type:'dashed'}}},
+    dataZoom:[{type:'inside',start:80,end:100},{type:'slider',start:80,end:100,height:20,bottom:0}],
+    legend:{data:['RSI(14)','K','D','J'],top:5},
+    series:[
+      {name:'RSI(14)',type:'line',data:rsiData,symbol:'none',lineStyle:{width:1.5,color:'#e74c3c'},smooth:true,
+        markLine:{data:[{yAxis:70,label:{formatter:'超买70'}},{yAxis:30,label:{formatter:'超卖30'}}],lineStyle:{type:'dashed',color:'#999'}}},
+      {name:'K',type:'line',data:kData,symbol:'none',lineStyle:{width:1,color:'#3498db'},smooth:true},
+      {name:'D',type:'line',data:dData,symbol:'none',lineStyle:{width:1,color:'#e67e22'},smooth:true},
+      {name:'J',type:'line',data:jData,symbol:'none',lineStyle:{width:1,color:'#9b59b6'},smooth:true}
+    ]
+  });
+}
+
+function drawRecentTable() {
+  const recent = rawData.slice(-10);
+  let html = '<tr><th>日期</th><th>开盘</th><th>最高</th><th>最低</th><th>收盘</th><th>涨跌幅</th><th>成交量</th></tr>';
+  for (let i=0;i<recent.length;i++) {
+    const d=recent[i], pc=i>0?recent[i-1].c:d.o, chg=(d.c-pc)/pc*100, cls=chg>=0?'up':'down';
+    html += `<tr><td>${d.d}</td><td>${d.o.toFixed(2)}</td><td>${d.h.toFixed(2)}</td><td>${d.l.toFixed(2)}</td>
+      <td class="${cls}"><b>${d.c.toFixed(2)}</b></td><td class="${cls}">${chg>=0?'+':''}${chg.toFixed(2)}%</td>
+      <td>${(d.v/10000).toFixed(1)}万</td></tr>`;
+  }
+  document.getElementById('recentTable').innerHTML = html;
+}
+
+function drawMonthlyTable() {
+  const months={};
+  for (const d of rawData) {
+    const mk=d.d.substring(0,7);
+    if (!months[mk]) months[mk]={first:d.c,last:d.c,high:d.h,low:d.l};
+    else {months[mk].last=d.c;months[mk].high=Math.max(months[mk].high,d.h);months[mk].low=Math.min(months[mk].low,d.l);}
+  }
+  let html='<tr><th>月份</th><th>月初收盘</th><th>月末收盘</th><th>最高</th><th>最低</th><th>月涨跌</th></tr>';
+  for (const mk of Object.keys(months).sort()) {
+    const m=months[mk], chg=(m.last-m.first)/m.first*100, cls=chg>=0?'up':'down';
+    html += `<tr><td>${mk}</td><td>${m.first.toFixed(2)}</td><td class="${cls}"><b>${m.last.toFixed(2)}</b></td>
+      <td>${m.high.toFixed(2)}</td><td>${m.low.toFixed(2)}</td><td class="${cls}">${chg>=0?'+':''}${chg.toFixed(2)}%</td></tr>`;
+  }
+  document.getElementById('monthlyTable').innerHTML = html;
+}
+
+function drawNews() {
+  const impactMap = { bull: '利好', bear: '利空', neutral: '中性' };
+  const tagNameMap = { policy:'行业政策', industry:'行业动态', company:'公司要闻', macro:'宏观经济', market:'市场消息', other:'其他' };
+  if (!newsData.length) {
+    document.getElementById('newsList').innerHTML = '<div style="text-align:center;color:#999;padding:20px;font-size:13px;">暂无新闻数据</div>';
+    return;
+  }
+  let html = '';
+  for (const n of newsData) {
+    const tagName = tagNameMap[n.tagType] || n.tag;
+    const impactText = impactMap[n.impact] || '';
+    html += `<div class="news-item">
+      <div class="news-meta">
+        <span class="news-tag ${n.tagType}">${tagName}</span>
+        <span>${n.date}</span>
+        ${n.impact ? `<span class="news-impact ${n.impact}">${impactText}</span>` : ''}
+      </div>
+      <div class="news-title">${n.title}</div>
+      <div class="news-summary">${n.summary}</div>
+    </div>`;
+  }
+  document.getElementById('newsList').innerHTML = html;
+}
+
+function drawSummary() {
+  const li = indData[indData.length-1] || {};
+  const lc = closes[closes.length-1] || 0;
+  const lo = opens[opens.length-1] || 0;
+  const bulls=[], bears=[];
+  if (li.rsi>50) bulls.push('RSI偏强 ('+li.rsi.toFixed(1)+')'); else bears.push('RSI偏弱 ('+li.rsi.toFixed(1)+')');
+  if (li.k>li.dd) bulls.push('KDJ多头'); else bears.push('KDJ空头');
+  if (lc>lo) bulls.push('最新日收涨'); else bears.push('最新日下跌');
+  if (li.macdH>0) bulls.push('MACD柱为正'); else bears.push('MACD柱为负');
+  if (li.macdD>li.macdDea) bulls.push('MACD多头'); else bears.push('MACD空头');
+  const net=bulls.length-bears.length;
+  let verdict,desc;
+  if (net>=3){verdict='强势多头';desc='趋势向上明显';}
+  else if(net>=1){verdict='偏多头';desc='短期走势偏多';}
+  else if(net>=-1){verdict='偏空头';desc='短期走势偏弱';}
+  else{verdict='强势空头';desc='趋势向下明显';}
+  document.getElementById('signalSummary').innerHTML = `
+    <div class="signal-box signal-bull"><div class="s-label">多头信号 (${bulls.length})</div>
+    <ul>${bulls.map(s=>'<li>+ '+s+'</li>').join('')}</ul></div>
+    <div class="signal-box signal-bear"><div class="s-label">空头信号 (${bears.length})</div>
+    <ul>${bears.map(s=>'<li>- '+s+'</li>').join('')}</ul></div>`;
+  document.getElementById('verdictBox').innerHTML = `
+    <div class="v-label">综合评价</div>
+    <div class="v-value">${verdict}</div>
+    <div class="v-desc">${desc} (多头${bulls.length} vs 空头${bears.length})</div>`;
+}
+
+function switchView(view) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  ['chartKline','chartMa','chartVolume'].forEach(id=>{
+    document.getElementById(id).style.display=id==='chart'+view.charAt(0).toUpperCase()+view.slice(1)?'block':'none';
+  });
+  setTimeout(()=>eval(`chart${view.charAt(0).toUpperCase()+view.slice(1)}`).resize(),100);
+}
+
+window.addEventListener('resize', ()=>{
+  [chartKline,chartMa,chartVolume,chartMacd,chartRsiKdj].forEach(c=>c&&c.resize());
+});
+
+// ========== COMPREHENSIVE EVALUATION ==========
+function drawEvaluation() {
+  // SWOT
+  document.getElementById('swotStrengths').innerHTML = evalData.swot.strengths.map(s => '<li style="padding:3px 0;">✓ ' + s + '</li>').join('');
+  document.getElementById('swotWeaknesses').innerHTML = evalData.swot.weaknesses.map(s => '<li style="padding:3px 0;">✗ ' + s + '</li>').join('');
+  document.getElementById('swotOpportunities').innerHTML = evalData.swot.opportunities.map(s => '<li style="padding:3px 0;">★ ' + s + '</li>').join('');
+  document.getElementById('swotThreats').innerHTML = evalData.swot.threats.map(s => '<li style="padding:3px 0;">▲ ' + s + '</li>').join('');
+
+  // Score summary
+  document.getElementById('totalScore').textContent = evalData.score + ' / 10';
+  document.getElementById('totalRating').textContent = evalData.rating;
+
+  // Score table
+  evalData.dimensions.forEach((d, i) => {
+    const idx = i + 1;
+    document.getElementById('s' + idx).textContent = d.score;
+    document.getElementById('w' + idx).textContent = d.weighted;
+    document.getElementById('d' + idx).textContent = d.desc;
+  });
+  const totalW = evalData.dimensions.reduce((sum, d) => sum + parseFloat(d.weighted), 0);
+  document.getElementById('totalWeighted').textContent = totalW.toFixed(2);
+  document.getElementById('totalDesc').textContent = '评级: ' + evalData.rating;
+
+  // Verdict monospace box
+  const v = evalData.verdict;
+  document.getElementById('verdictMonospace').innerHTML =
+    '╔══════════════════════════════════════════════════════════╗<br>' +
+    '║  综合评级: ' + evalData.rating + '    评分: ' + evalData.score + '/10                 ║<br>' +
+    '║                                                          ║<br>' +
+    '║  入场区间: ' + v.entry + '   分3批建仓                ║<br>' +
+    '║  目标价位: ' + v.target + '                        ║<br>' +
+    '║  止损价位: ' + v.stop + '                             ║<br>' +
+    '║  投资期限: ' + v.period + '   建议仓位: ' + v.position + '                ║<br>' +
+    '║  风险收益比: ' + v.riskReward + '                                      ║<br>' +
+    '╚══════════════════════════════════════════════════════════╝<br>';
+
+  // Core thesis
+  document.getElementById('coreThesis').innerHTML = '<strong>核心论点</strong>: ' + evalData.thesis;
+}
+
+window.onload = ()=>{ drawKline();drawMa();drawVolume();drawMacd();drawRsiKdj();drawRecentTable();drawMonthlyTable();drawNews();drawSummary();drawEvaluation(); };
+</script>
+</body>
+</html>
